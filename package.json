@@ -1,0 +1,16 @@
+{
+  "name": "node-course",
+  "version": "0.0.1",
+  "description": "Node mentoring program",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "npm test",
+    "start": "nodemon index.js"
+  },
+  "author": "J Alejandro Duarte S",
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
