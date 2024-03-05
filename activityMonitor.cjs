@@ -4,44 +4,48 @@ const fs = require('fs');
 
 const platform = os.platform();
 
-let result = '';
-
 const command = platform === 'win32' ?
     `powershell "Get-Process | Sort-Object CPU -Descending | Select-Object -Property Name, CPU, WorkingSet -First 1 | ForEach-Object { $_.Name + ' ' + $_.CPU + ' ' + $_.WorkingSet }"` :
     'ps -A -o %cpu,%mem,comm | sort -nr | head -n 1';
 
-const execProcess = (command, args) => {
-    const process = childProcess.exec(command, args);
+const execProcess = (command, callback) => {
+    const process = childProcess.exec(command, callback);
     
     process.stderr.on('data', (data) =>  {
         console.error(`stderr: ${data}`);
     });
-
-    process.stdout.on('data', (data) => {
-        result = data;
-    });
 };
 
 const logWrite = (command) => {
-    execProcess(command);
-    const lineToAppend = `${Date.now()} : ${result}`;
-    fs.appendFile('activityMonitor.log', lineToAppend, (err) => {
-        if (err) console.log("And error has happened while reading/writing the file");
+    execProcess(command, (error, stdout, stderr) => {
+        if(error !== null) {
+            console.error("An error has ocurred: ", error);
+        }
+
+        const lineToAppend = `${Date.now()} : ${stdout}`;
+        fs.appendFile('activityMonitor.log', lineToAppend, (err) => {
+            if (err) console.log("And error has happened while reading/writing the file");
+        });
     });
 };
 
 const consoleWrite = (command) => {
-    execProcess(command);
-    process.stdout.write(`\r\x1Bc`);
-    const consoleSize = process.stdout.columns;
+    execProcess(command, (error, stdout, stderr) => {
+        if(error !== null) {
+            console.error("An error has ocurred: ", error);
+        }
 
-    if(result.length > consoleSize) {
-        let newOutput = result.slice(0, consoleSize - 3);
-        newOutput += '...';
-        process.stdout.write(`${newOutput}`);
-    } else {
-        process.stdout.write(`${result}`);
-    }
+        process.stdout.write(`\r\x1Bc`);
+        const consoleSize = process.stdout.columns;
+
+        if(stdout.length > consoleSize) {
+            let newOutput = stdout.slice(0, consoleSize - 3);
+            newOutput += '...';
+            process.stdout.write(`${newOutput}`);
+        } else {
+            process.stdout.write(`${stdout}`);
+        }
+    });
 }
 
 setInterval(logWrite, 60000, command);
