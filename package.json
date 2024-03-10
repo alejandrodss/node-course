@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "test": "npm test",
-    "start": "nodemon index.js"
+    "start": "nodemon index.js",
+    "task1": "node ./week-3/task1/EventEmitterTest.js",
+    "task2": "node ./week-3/task2/WithTimeTest.js"
   },
   "author": "J Alejandro Duarte S",
   "license": "MIT",
