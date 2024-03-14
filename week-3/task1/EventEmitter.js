@@ -51,18 +51,18 @@ export default class EventEmitter {
     listenerCount(eventName) {
         let count = 0;
         if(this.listeners.hasOwnProperty(eventName)) {
-            const listeners = this.listeners[eventName]
-            let filteredListeners = listeners.filter(listener => !listener.once);
-            count = filteredListeners.length;
+            count = this.listeners[eventName].length
         }
         return count;
     }
    
     rawListeners(eventName) {
-        let count = 0;
+        let listeners = [];
         if(this.listeners.hasOwnProperty(eventName)) {
-            count = this.listeners[eventName].length
+            for(let listener of this.listeners[eventName]){
+                listeners.push(listener.fn)
+            }
         }
-        return count;
+        return listeners;
     }
 }
