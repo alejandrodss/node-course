@@ -1,8 +1,9 @@
 import WithTime from "./WithTime.js";
 
-const fetchFromUrl = async (url, cb) => {
-    const response = await fetch(url);
-    response.json().then((data) => {
+const fetchFromUrl = (url, cb) => {
+    fetch(url)
+    .then(response => response.json())
+    .then(data => {
         cb(null, data);
     }).catch((err) => cb(err));
 }
