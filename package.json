@@ -6,11 +6,17 @@
   "type": "module",
   "scripts": {
     "test": "npm test",
-    "start": "nodemon index.js"
+    "start": "nodemon index.js",
+    "task1": "node ./week-3/task1/EventEmitterTest.js",
+    "task2": "node ./week-3/task2/WithTimeTest.js",
+    "task3": "nodemon ./week-3/task3/Task3.cjs"
   },
   "author": "J Alejandro Duarte S",
   "license": "MIT",
   "devDependencies": {
     "nodemon": "^3.1.0"
+  },
+  "dependencies": {
+    "csvtojson": "^2.0.10"
   }
 }
