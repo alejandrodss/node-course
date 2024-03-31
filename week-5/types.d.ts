@@ -5,6 +5,11 @@ export interface User {
   hobbies: string[]
 }
 
+export interface PostUser {
+  name: string,
+  email: string
+}
+
 export interface UserResponse {
   id: string,
   name: string,

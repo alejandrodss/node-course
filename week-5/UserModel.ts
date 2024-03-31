@@ -1,4 +1,5 @@
-import type { User } from './types.d.ts';
+import { UUID, randomUUID } from 'crypto';
+import type { User, PostUser } from './types.d.ts';
 
 export default class UserModel {
   users: User[];
@@ -12,20 +13,21 @@ export default class UserModel {
     return this.users.find( (user) => user.id === id);
   }
 
-  createUser(user: User) : void {
-    const currentUser = this.getUser(user.id);
-    if(currentUser === undefined) {
-      this.users.push(user);
-    } else {
-      throw new Error("Duplicated user");
+  createUser(user: PostUser) : User {
+    let newUser: User = {
+      id: randomUUID(),
+      hobbies: [],
+      ...user
     }
+    this.users.push(newUser);
+    return newUser;
   }
 
   getUsers() : User[] {
     return this.users;
   }
 
-  deleteUser(id: string) : User | void {
+  deleteUser(id: string) : User {
     const userIndex = this.users.findIndex( (user) => user.id === id);
     if(userIndex >= 0) {
       return this.users.splice(userIndex, 1)[0];
@@ -39,9 +41,9 @@ export default class UserModel {
     if(user === undefined) {
       throw new Error("User not found");
     } else {
-      user.hobbies = hobbies;
+      const newHobbies = new Set([...user.hobbies, ...hobbies])
+      user.hobbies = [...newHobbies];
     }
-    console.log(this.users);
   }
 
   getHobbies(id: string) : string[] {
