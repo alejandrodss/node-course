@@ -10,18 +10,26 @@ export interface PostUser {
   email: string
 }
 
-export interface UserResponse {
+interface UserData {
   id: string,
   name: string,
   email: string
 }
 
-export interface ResponseWithData {
-  data: {
-    user: UserResponse,
-    links: {
-      self: string,
-      hobbies: string
-    }
+interface links {
+  self: string,
+  hobbies: string
+}
+
+export interface UserResponse {
+  user: UserData,
+  links: links
+}
+
+export interface HobbiesResponse {
+  hobbies: string [],
+  links: {
+    self: string,
+    user: string
   }
 }

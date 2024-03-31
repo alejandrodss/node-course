@@ -19,7 +19,7 @@ var processGetRequest = function (userModel, req) {
     if (url === undefined) {
         return undefined;
     }
-    var regexp = /^\/api\/users\/(?<userid>[a-zA-Z0-9]+)\/hobbies$/ig;
+    var regexp = /^\/api\/users\/(?<userid>[a-zA-Z0-9\-]+)\/hobbies$/ig;
     if (url === '/api/users') {
         return userModel.getUsers();
     }
@@ -33,7 +33,7 @@ var processGetRequest = function (userModel, req) {
                 console.log("matches regexp");
                 if (match.groups !== undefined) {
                     console.log("fetching hobbies");
-                    return userModel.getUser(match.groups.userid);
+                    return userModel.getHobbiesResponse(match.groups.userid);
                 }
                 else {
                     return undefined;
@@ -79,7 +79,7 @@ var processDeleteRequest = function (userModel, req) {
         return undefined;
     }
     console.log("requested url", url);
-    var regexp = /^\/api\/users\/(?<userid>[a-zA-Z0-9]+)$/ig;
+    var regexp = /^\/api\/users\/(?<userid>[a-zA-Z0-9\-]+)$/ig;
     try {
         for (var _b = __values(url.matchAll(regexp)), _c = _b.next(); !_c.done; _c = _b.next()) {
             var match = _c.value;
@@ -120,8 +120,8 @@ var processPatchRequest = function (userModel, req) { return new Promise(functio
                     .then(function (parsedBody) {
                     if (parsedBody.hasOwnProperty("hobbies")) {
                         var hobbies = parsedBody["hobbies"];
-                        userModel.updateHobbies(userId_1, hobbies);
-                        resolve("{\"status\": \"User ".concat(userId_1, " updated\"}"));
+                        var userResponse = userModel.updateHobbies(userId_1, hobbies);
+                        resolve(userResponse);
                     }
                     else {
                         reject('Missing key \'hobbies\'');

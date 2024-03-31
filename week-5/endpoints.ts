@@ -1,16 +1,16 @@
 import * as url from 'url';
 import * as http from 'http';
 import UserModel from './UserModel';
-import type { PostUser, User } from './types';
+import type { HobbiesResponse, PostUser, UserResponse } from './types';
 
 const domain = "http://localhost:8000";
 
-export const processGetRequest = (userModel: UserModel, req: http.IncomingMessage): User | undefined | User[] => {
+export const processGetRequest = (userModel: UserModel, req: http.IncomingMessage): HobbiesResponse | undefined | UserResponse[] => {
   const url = req.url;
   if(url === undefined ) {
     return undefined;
   }
-  const regexp = /^\/api\/users\/(?<userid>[a-zA-Z0-9]+)\/hobbies$/ig;
+  const regexp = /^\/api\/users\/(?<userid>[a-zA-Z0-9\-]+)\/hobbies$/ig;
   if(url === '/api/users'){
     return userModel.getUsers();
   } else {
@@ -21,7 +21,7 @@ export const processGetRequest = (userModel: UserModel, req: http.IncomingMessag
       console.log("matches regexp");
       if(match.groups !== undefined) {
         console.log("fetching hobbies");
-        return userModel.getUser(match.groups.userid);
+        return userModel.getHobbiesResponse(match.groups.userid);
       } else {
         return undefined;
       }
@@ -50,13 +50,13 @@ export const processPostRequest = (userModel: UserModel, req: http.IncomingMessa
   }
 });
 
-export const processDeleteRequest = (userModel : UserModel, req : http.IncomingMessage) : User | undefined => {
+export const processDeleteRequest = (userModel : UserModel, req : http.IncomingMessage) : UserResponse | undefined => {
   const url = req.url;
   if (url === undefined) {
     return undefined;
   }
   console.log("requested url", url);
-  const regexp = /^\/api\/users\/(?<userid>[a-zA-Z0-9]+)$/ig;
+  const regexp = /^\/api\/users\/(?<userid>[a-zA-Z0-9\-]+)$/ig;
   for (const match of url.matchAll(regexp)) {
     console.log("matches regexp");
     if (match.groups !== undefined) {
@@ -86,8 +86,8 @@ export const processPatchRequest = (userModel : UserModel, req : http.IncomingMe
         .then((parsedBody) => {
           if((parsedBody as Object).hasOwnProperty("hobbies")){
             let hobbies = (parsedBody as Object)["hobbies"];
-            userModel.updateHobbies(userId, hobbies);
-            resolve(`{"status": "User ${userId} updated"}`);
+            const userResponse = userModel.updateHobbies(userId, hobbies);
+            resolve(userResponse);
           } else {
             reject('Missing key \'hobbies\'');
           }

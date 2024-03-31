@@ -45,41 +45,78 @@ var UserModel = /** @class */ (function () {
     UserModel.prototype.getUser = function (id) {
         return this.users.find(function (user) { return user.id === id; });
     };
+    UserModel.prototype.getUserData = function (id) {
+        var user = this.getUser(id);
+        if (user === undefined) {
+            return;
+        }
+        return this._getUserResponse(user);
+    };
     UserModel.prototype.createUser = function (user) {
         var newUser = __assign({ id: (0, crypto_1.randomUUID)(), hobbies: [] }, user);
         this.users.push(newUser);
-        return newUser;
+        return this._getUserResponse(newUser);
     };
     UserModel.prototype.getUsers = function () {
-        return this.users;
+        var _this = this;
+        var users = [];
+        this.users.forEach(function (user) {
+            users.push(_this._getUserResponse(user));
+        });
+        return users;
     };
     UserModel.prototype.deleteUser = function (id) {
         var userIndex = this.users.findIndex(function (user) { return user.id === id; });
         if (userIndex >= 0) {
-            return this.users.splice(userIndex, 1)[0];
+            var deletedUser = this.users.splice(userIndex, 1)[0];
+            return this._getUserResponse(deletedUser);
         }
         else {
-            throw new Error("User not found");
+            throw new Error("User with id ".concat(id, " doesn't exist"));
         }
     };
     UserModel.prototype.updateHobbies = function (id, hobbies) {
         var user = this.getUser(id);
         if (user === undefined) {
-            throw new Error("User not found");
+            throw new Error("User with id ".concat(id, " doesn't exist"));
         }
         else {
             var newHobbies = new Set(__spreadArray(__spreadArray([], __read(user.hobbies), false), __read(hobbies), false));
             user.hobbies = __spreadArray([], __read(newHobbies), false);
+            return this._getUserResponse(user);
         }
     };
     UserModel.prototype.getHobbies = function (id) {
         var user = this.getUser(id);
         if (user === undefined) {
-            throw new Error("User not found");
+            throw new Error("User with id ".concat(id, " doesn't exist"));
         }
         else {
             return user.hobbies;
         }
+    };
+    UserModel.prototype.getHobbiesResponse = function (id) {
+        var hobbies = this.getHobbies(id);
+        return ({
+            hobbies: hobbies,
+            links: {
+                self: "/api/users/".concat(id, "/hobbies"),
+                user: "/api/users/".concat(id)
+            }
+        });
+    };
+    UserModel.prototype._getUserResponse = function (user) {
+        return ({
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email
+            },
+            links: {
+                self: "/api/users/".concat(user.id),
+                hobbies: "/api/users/".concat(user.id, "/hobbies")
+            }
+        });
     };
     return UserModel;
 }());
