@@ -1,5 +1,5 @@
 import { UUID, randomUUID } from 'crypto';
-import type { User, PostUser, UserResponse, HobbiesResponse } from './types.d.ts';
+import type { User, PostUser, UserResponse, HobbiesResponse, SuccessfulResponse } from './types.d.ts';
 
 export default class UserModel {
   users: User[];
@@ -39,6 +39,17 @@ export default class UserModel {
     return users;
   }
 
+  deleteUser(id: string) : SuccessfulResponse {
+    const userIndex = this.users.findIndex( (user) => user.id === id);
+    if(userIndex >= 0) {
+      const deletedUser = this.users.splice(userIndex, 1)[0];
+      return({ success: true });
+    } else {
+      throw new Error(`User with id ${id} doesn't exist`);
+    }
+  }
+
+  /* Return the deleted user
   deleteUser(id: string) : UserResponse {
     const userIndex = this.users.findIndex( (user) => user.id === id);
     if(userIndex >= 0) {
@@ -47,7 +58,7 @@ export default class UserModel {
     } else {
       throw new Error(`User with id ${id} doesn't exist`);
     }
-  }
+  } */
 
   updateHobbies(id: string, hobbies: string[]) : UserResponse {
     const user = this.getUser(id);

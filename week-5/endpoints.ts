@@ -1,7 +1,7 @@
 import * as url from 'url';
 import * as http from 'http';
 import UserModel from './UserModel';
-import type { HobbiesResponse, PostUser, UserResponse } from './types';
+import type { HobbiesResponse, PostUser, UserResponse, SuccessfulResponse } from './types';
 
 const domain = "http://localhost:8000";
 
@@ -14,13 +14,8 @@ export const processGetRequest = (userModel: UserModel, req: http.IncomingMessag
   if(url === '/api/users'){
     return userModel.getUsers();
   } else {
-    /*console.log("regexp pass");
-    const matches = [...url.matchAll(regexp)];
-    console.log(matches);*/
     for(const match of url.matchAll(regexp)) {
-      console.log("matches regexp");
       if(match.groups !== undefined) {
-        console.log("fetching hobbies");
         return userModel.getHobbiesResponse(match.groups.userid);
       } else {
         return undefined;
@@ -35,9 +30,7 @@ export const processPostRequest = (userModel: UserModel, req: http.IncomingMessa
   if (url === undefined) {
     resolve(undefined);
   }
-  console.log("url is ", url);
   if(url === '/api/users') {
-    console.log("we're here");
     parseRequestBody(req).then((parsedBody) => {
       const newUser = userModel.createUser(parsedBody as PostUser);
       resolve(newUser);
@@ -50,17 +43,14 @@ export const processPostRequest = (userModel: UserModel, req: http.IncomingMessa
   }
 });
 
-export const processDeleteRequest = (userModel : UserModel, req : http.IncomingMessage) : UserResponse | undefined => {
+export const processDeleteRequest = (userModel : UserModel, req : http.IncomingMessage) : SuccessfulResponse | undefined => {
   const url = req.url;
   if (url === undefined) {
     return undefined;
   }
-  console.log("requested url", url);
   const regexp = /^\/api\/users\/(?<userid>[a-zA-Z0-9\-]+)$/ig;
   for (const match of url.matchAll(regexp)) {
-    console.log("matches regexp");
     if (match.groups !== undefined) {
-      console.log("deleting user");
       return userModel.deleteUser(match.groups.userid);
     } else {
       return undefined;
@@ -73,15 +63,12 @@ export const processPatchRequest = (userModel : UserModel, req : http.IncomingMe
   if (url === undefined) {
     resolve(undefined);
   } else {
-    console.log("url is ", url);
     const regexp = /^\/api\/users\/(?<userid>[a-zA-Z0-9\-]+)\/hobbies$/ig;
-    //resolver promesa si no hay match
+    let isMatched = false;
     for (const match of url.matchAll(regexp)) {
-      console.log("matches regexp");
+      isMatched = true;
       if (match.groups !== undefined) {
         let userId = match.groups.userid;
-        console.log("updating user's hobbies");
-
         parseRequestBody(req)
         .then((parsedBody) => {
           if((parsedBody as Object).hasOwnProperty("hobbies")){
@@ -98,6 +85,7 @@ export const processPatchRequest = (userModel : UserModel, req : http.IncomingMe
         resolve(undefined);
       }
     }
+    if(!isMatched) resolve(undefined);
   }
 });
 

@@ -25,14 +25,9 @@ var processGetRequest = function (userModel, req) {
     }
     else {
         try {
-            /*console.log("regexp pass");
-            const matches = [...url.matchAll(regexp)];
-            console.log(matches);*/
             for (var _b = __values(url.matchAll(regexp)), _c = _b.next(); !_c.done; _c = _b.next()) {
                 var match = _c.value;
-                console.log("matches regexp");
                 if (match.groups !== undefined) {
-                    console.log("fetching hobbies");
                     return userModel.getHobbiesResponse(match.groups.userid);
                 }
                 else {
@@ -56,9 +51,7 @@ var processPostRequest = function (userModel, req) { return new Promise(function
     if (url === undefined) {
         resolve(undefined);
     }
-    console.log("url is ", url);
     if (url === '/api/users') {
-        console.log("we're here");
         parseRequestBody(req).then(function (parsedBody) {
             var newUser = userModel.createUser(parsedBody);
             resolve(newUser);
@@ -78,14 +71,11 @@ var processDeleteRequest = function (userModel, req) {
     if (url === undefined) {
         return undefined;
     }
-    console.log("requested url", url);
     var regexp = /^\/api\/users\/(?<userid>[a-zA-Z0-9\-]+)$/ig;
     try {
         for (var _b = __values(url.matchAll(regexp)), _c = _b.next(); !_c.done; _c = _b.next()) {
             var match = _c.value;
-            console.log("matches regexp");
             if (match.groups !== undefined) {
-                console.log("deleting user");
                 return userModel.deleteUser(match.groups.userid);
             }
             else {
@@ -109,13 +99,12 @@ var processPatchRequest = function (userModel, req) { return new Promise(functio
         resolve(undefined);
     }
     else {
-        console.log("url is ", url);
         var regexp = /^\/api\/users\/(?<userid>[a-zA-Z0-9\-]+)\/hobbies$/ig;
+        var isMatched = false;
         var _loop_1 = function (match) {
-            console.log("matches regexp");
+            isMatched = true;
             if (match.groups !== undefined) {
                 var userId_1 = match.groups.userid;
-                console.log("updating user's hobbies");
                 parseRequestBody(req)
                     .then(function (parsedBody) {
                     if (parsedBody.hasOwnProperty("hobbies")) {
@@ -135,7 +124,6 @@ var processPatchRequest = function (userModel, req) { return new Promise(functio
             }
         };
         try {
-            //resolver promesa si no hay match
             for (var _b = __values(url.matchAll(regexp)), _c = _b.next(); !_c.done; _c = _b.next()) {
                 var match = _c.value;
                 _loop_1(match);
@@ -148,6 +136,8 @@ var processPatchRequest = function (userModel, req) { return new Promise(functio
             }
             finally { if (e_3) throw e_3.error; }
         }
+        if (!isMatched)
+            resolve(undefined);
     }
 }); };
 exports.processPatchRequest = processPatchRequest;

@@ -33,3 +33,7 @@ export interface HobbiesResponse {
     user: string
   }
 }
+
+export interface SuccessfulResponse {
+  success: true
+}

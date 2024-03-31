@@ -68,7 +68,6 @@ server.listen(8000, () => {
 const setServerResponse = (response, res:http.ServerResponse) => {
   if (response !== undefined) {
     res.statusCode = 200;
-    console.log(response);
     const serverResponse = {
       data: response,
       error: null

@@ -67,7 +67,6 @@ server.listen(8000, function () {
 var setServerResponse = function (response, res) {
     if (response !== undefined) {
         res.statusCode = 200;
-        console.log(response);
         var serverResponse = {
             data: response,
             error: null

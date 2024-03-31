@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "npm test",
-    "start": "nodemon index.js",
+    "start": "./node_modules/.bin/pm2 start ./week-5/build/index.js --name network-task",
+    "stop": "./node_modules/.bin/pm2 stop network-task",
+    "firstweek": "nodemon index.js",
     "task1": "node ./week-3/task1/EventEmitterTest.js",
     "task2": "node ./week-3/task2/WithTimeTest.js",
     "task3": "nodemon ./week-3/task3/Task3.cjs"
@@ -15,6 +17,7 @@
   "devDependencies": {
     "@types/node": "^20.11.30",
     "nodemon": "^3.1.0",
+    "pm2": "^5.3.1",
     "typescript": "^5.4.3"
   },
   "dependencies": {

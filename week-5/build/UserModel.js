@@ -69,12 +69,22 @@ var UserModel = /** @class */ (function () {
         var userIndex = this.users.findIndex(function (user) { return user.id === id; });
         if (userIndex >= 0) {
             var deletedUser = this.users.splice(userIndex, 1)[0];
-            return this._getUserResponse(deletedUser);
+            return ({ success: true });
         }
         else {
             throw new Error("User with id ".concat(id, " doesn't exist"));
         }
     };
+    /* Return the deleted user
+    deleteUser(id: string) : UserResponse {
+      const userIndex = this.users.findIndex( (user) => user.id === id);
+      if(userIndex >= 0) {
+        const deletedUser = this.users.splice(userIndex, 1)[0];
+        return this._getUserResponse(deletedUser);
+      } else {
+        throw new Error(`User with id ${id} doesn't exist`);
+      }
+    } */
     UserModel.prototype.updateHobbies = function (id, hobbies) {
         var user = this.getUser(id);
         if (user === undefined) {
