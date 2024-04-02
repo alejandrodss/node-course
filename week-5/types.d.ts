@@ -5,25 +5,18 @@ export interface User {
   hobbies: string[]
 }
 
-export interface PostUser {
-  name: string,
-  email: string
-}
+export type PostUser = Pick<User, 'name' | 'email'>;
 
-interface UserData {
-  id: string,
-  name: string,
-  email: string
-}
+type UserData = Omit<User, 'hobbies'>;
 
-interface links {
+interface Links {
   self: string,
   hobbies: string
 }
 
 export interface UserResponse {
   user: UserData,
-  links: links
+  links: Links
 }
 
 export interface HobbiesResponse {

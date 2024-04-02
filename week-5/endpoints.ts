@@ -8,7 +8,7 @@ const domain = "http://localhost:8000";
 export const processGetRequest = (userModel: UserModel, req: http.IncomingMessage): HobbiesResponse | undefined | UserResponse[] => {
   const url = req.url;
   if(url === undefined ) {
-    return undefined;
+    return;
   }
   const regexp = /^\/api\/users\/(?<userid>[a-zA-Z0-9\-]+)\/hobbies$/ig;
   if(url === '/api/users'){
@@ -18,76 +18,72 @@ export const processGetRequest = (userModel: UserModel, req: http.IncomingMessag
       if(match.groups !== undefined) {
         return userModel.getHobbiesResponse(match.groups.userid);
       } else {
-        return undefined;
+        return;
       }
     }
   }
-  return undefined;
+  return;
 };
 
-export const processPostRequest = (userModel: UserModel, req: http.IncomingMessage) => new Promise((resolve, reject) => {
+export const processPostRequest = async (userModel : UserModel, req: http.IncomingMessage) => {
   const url = req.url;
   if (url === undefined) {
-    resolve(undefined);
+    undefined;
   }
-  if(url === '/api/users') {
-    parseRequestBody(req).then((parsedBody) => {
-      const newUser = userModel.createUser(parsedBody as PostUser);
-      resolve(newUser);
-    })
-    .catch((error: Error) => {
-      reject(error);
-    });
-  } else {
-    resolve(undefined);
+  try {
+    if (url === '/api/users') {
+      const parsedBody = await parseRequestBody(req);
+      return userModel.createUser(parsedBody as PostUser);
+    } else {
+      return;
+    }
+  } catch (error) {
+    throw error;
   }
-});
+}
 
 export const processDeleteRequest = (userModel : UserModel, req : http.IncomingMessage) : SuccessfulResponse | undefined => {
   const url = req.url;
   if (url === undefined) {
-    return undefined;
+    return;
   }
   const regexp = /^\/api\/users\/(?<userid>[a-zA-Z0-9\-]+)$/ig;
   for (const match of url.matchAll(regexp)) {
     if (match.groups !== undefined) {
       return userModel.deleteUser(match.groups.userid);
     } else {
-      return undefined;
+      return;
     }
   }
 }
 
-export const processPatchRequest = (userModel : UserModel, req : http.IncomingMessage) => new Promise((resolve, reject) => {
+export const processPatchRequest = async (userModel : UserModel, req : http.IncomingMessage) => {
   const url = req.url;
   if (url === undefined) {
-    resolve(undefined);
-  } else {
-    const regexp = /^\/api\/users\/(?<userid>[a-zA-Z0-9\-]+)\/hobbies$/ig;
-    let isMatched = false;
+    return;
+  }
+  const regexp = /^\/api\/users\/(?<userid>[a-zA-Z0-9\-]+)\/hobbies$/ig;
+  try {
+    const parsedBody = await parseRequestBody(req);
     for (const match of url.matchAll(regexp)) {
-      isMatched = true;
       if (match.groups !== undefined) {
         let userId = match.groups.userid;
-        parseRequestBody(req)
-        .then((parsedBody) => {
-          if((parsedBody as Object).hasOwnProperty("hobbies")){
-            let hobbies = (parsedBody as Object)["hobbies"];
-            const userResponse = userModel.updateHobbies(userId, hobbies);
-            resolve(userResponse);
-          } else {
-            reject('Missing key \'hobbies\'');
-          }
-        }).catch((error: Error) => {
-          reject(error.message);
-        });
+        if ((parsedBody as Object).hasOwnProperty("hobbies")) {
+          let hobbies = (parsedBody as Object)["hobbies"];
+          return userModel.updateHobbies(userId, hobbies);
+        } else {
+          const error = new Error('Missing key \'hobbies\'');
+          error.name = 'MissingKeyError';
+          throw error;
+        }
       } else {
-        resolve(undefined);
+        return;
       }
     }
-    if(!isMatched) resolve(undefined);
+  } catch (error) {
+    throw error;
   }
-});
+}
 
 const parseRequestBody = (req: http.IncomingMessage) => new Promise((resolve, reject) => {
   let body: string = '';

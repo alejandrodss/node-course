@@ -24,7 +24,7 @@ const server = http.createServer((req, res) => {
       let response = processPostRequest(userModel, req);
       
       response.then((response) => {
-        setServerResponse(response, res);
+        setServerResponse(response, res, true);
       })
       .catch((error: Error) => {
         res.statusCode = 500;
@@ -41,19 +41,14 @@ const server = http.createServer((req, res) => {
     }
   }
   else if( req.method === 'PATCH' || req.method === 'PUT') {
-    try {
-      let response = processPatchRequest(userModel, req);
-      response.then((response) => {
-        setServerResponse(response, res);
-      })
-      .catch((error: Error) => {
-        res.statusCode = 422;
-        res.end(`{"data": null,\n"error": "${error}"}`);
-      });
-    } catch (error) {
-      res.statusCode = 404;
+    let response = processPatchRequest(userModel, req);
+    response.then((response) => {
+      setServerResponse(response, res);
+    })
+    .catch((error: Error) => {
+      res.statusCode = (error.name === 'UserNotFoundError') ? 404 : 422;
       res.end(`{"data": null,\n"error": "${error.message}"}`);
-    }
+    });
   }
   else {
     res.statusCode = 400;
@@ -65,9 +60,9 @@ server.listen(8000, () => {
   console.log('Server is running on port 8000');
 });
 
-const setServerResponse = (response, res:http.ServerResponse) => {
+const setServerResponse = (response, res:http.ServerResponse, created = false) => {
   if (response !== undefined) {
-    res.statusCode = 200;
+    res.statusCode = created ? 201 : 200;
     const serverResponse = {
       data: response,
       error: null

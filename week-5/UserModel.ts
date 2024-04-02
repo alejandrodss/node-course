@@ -32,11 +32,7 @@ export default class UserModel {
   }
 
   getUsers() : UserResponse[] {
-    let users : UserResponse[] = []
-    this.users.forEach(user => {
-      users.push(this._getUserResponse(user));
-    });
-    return users;
+    return this.users.map(this._getUserResponse);
   }
 
   deleteUser(id: string) : SuccessfulResponse {
@@ -63,7 +59,9 @@ export default class UserModel {
   updateHobbies(id: string, hobbies: string[]) : UserResponse {
     const user = this.getUser(id);
     if(user === undefined) {
-      throw new Error(`User with id ${id} doesn't exist`);
+      const error = new Error(`User with id ${id} doesn't exist`);
+      error.name = 'UserNotFoundError';
+      throw error;
     } else {
       const newHobbies = new Set([...user.hobbies, ...hobbies])
       user.hobbies = [...newHobbies];

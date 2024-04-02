@@ -23,7 +23,7 @@ var server = http.createServer(function (req, res) {
     else if (req.method === 'POST') {
         var response = (0, endpoints_1.processPostRequest)(userModel, req);
         response.then(function (response) {
-            setServerResponse(response, res);
+            setServerResponse(response, res, true);
         })
             .catch(function (error) {
             res.statusCode = 500;
@@ -41,20 +41,14 @@ var server = http.createServer(function (req, res) {
         }
     }
     else if (req.method === 'PATCH' || req.method === 'PUT') {
-        try {
-            var response = (0, endpoints_1.processPatchRequest)(userModel, req);
-            response.then(function (response) {
-                setServerResponse(response, res);
-            })
-                .catch(function (error) {
-                res.statusCode = 422;
-                res.end("{\"data\": null,\n\"error\": \"".concat(error, "\"}"));
-            });
-        }
-        catch (error) {
-            res.statusCode = 404;
+        var response = (0, endpoints_1.processPatchRequest)(userModel, req);
+        response.then(function (response) {
+            setServerResponse(response, res);
+        })
+            .catch(function (error) {
+            res.statusCode = (error.name === 'UserNotFoundError') ? 404 : 422;
             res.end("{\"data\": null,\n\"error\": \"".concat(error.message, "\"}"));
-        }
+        });
     }
     else {
         res.statusCode = 400;
@@ -64,9 +58,10 @@ var server = http.createServer(function (req, res) {
 server.listen(8000, function () {
     console.log('Server is running on port 8000');
 });
-var setServerResponse = function (response, res) {
+var setServerResponse = function (response, res, created) {
+    if (created === void 0) { created = false; }
     if (response !== undefined) {
-        res.statusCode = 200;
+        res.statusCode = created ? 201 : 200;
         var serverResponse = {
             data: response,
             error: null

@@ -58,12 +58,7 @@ var UserModel = /** @class */ (function () {
         return this._getUserResponse(newUser);
     };
     UserModel.prototype.getUsers = function () {
-        var _this = this;
-        var users = [];
-        this.users.forEach(function (user) {
-            users.push(_this._getUserResponse(user));
-        });
-        return users;
+        return this.users.map(this._getUserResponse);
     };
     UserModel.prototype.deleteUser = function (id) {
         var userIndex = this.users.findIndex(function (user) { return user.id === id; });
@@ -88,7 +83,9 @@ var UserModel = /** @class */ (function () {
     UserModel.prototype.updateHobbies = function (id, hobbies) {
         var user = this.getUser(id);
         if (user === undefined) {
-            throw new Error("User with id ".concat(id, " doesn't exist"));
+            var error = new Error("User with id ".concat(id, " doesn't exist"));
+            error.name = 'UserNotFoundError';
+            throw error;
         }
         else {
             var newHobbies = new Set(__spreadArray(__spreadArray([], __read(user.hobbies), false), __read(hobbies), false));
